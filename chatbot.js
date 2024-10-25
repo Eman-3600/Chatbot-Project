@@ -1,9 +1,18 @@
 const sendButton = document.getElementById('send-button');
 const userInput = document.getElementById('user-input');
 const chatBox = document.getElementById('chat-box');
+const form = document.getElementById('api-key-form');
+const responseDiv = document.getElementById('response');
 
-// API Key should be stored securely on the server side for actual implementations
-const OPENAI_API_KEY = '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';
+// Save the API key from the form into localStorage
+form.addEventListener('submit', (event) => {
+  event.preventDefault(); // Prevent form from reloading the page
+
+  const apiKey = document.getElementById('apiKey').value;
+  localStorage.setItem('userApiKey', apiKey); // Save to localStorage
+  alert('API Key saved successfully!');
+  form.reset(); // Clear the form input
+});
 
 // Initialize an array to store message history
 let messageHistory = [];
@@ -11,25 +20,27 @@ let messageHistory = [];
 // Custom system message
 const systemMessage = {
   role: 'system',
-  content: 'You are a tutor for discrete mathematics with a comically mean and condescending attitude. You should be as helpful as you are cruel to encourage the user to seek help from their actual professor instead.'
+  content: 'You are a tutor for discrete mathematics with a comically mean and condescending attitude. You should be as helpful as you are cruel to encourage the user to seek help from their actual professor instead.',
 };
 
-// Push the system message to the message history at the start
+// Add the system message to the message history
 messageHistory.push(systemMessage);
 
-async function sendMessage(message) {
-  displayMessage('You: ' + message);
+// Function to make an API request using the stored API key
+async function makeApiRequest(prompt) {
+  const apiKey = localStorage.getItem('userApiKey'); // Retrieve from localStorage
 
-  // Add the user's message to the message history
-  messageHistory.push({ role: 'user', content: message });
+  if (!apiKey) {
+    responseDiv.textContent = 'Error: Please enter your API key first.';
+    return;
+  }
 
   try {
-    // Send the request with the full message history
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: 'gpt-3.5-turbo',
@@ -37,44 +48,43 @@ async function sendMessage(message) {
       }),
     });
 
-    if (!response.ok) {
+    if (!res.ok) {
       throw new Error('Failed to communicate with the server. Please try again later.');
     }
 
-    const data = await response.json();
+    const data = await res.json();
     const reply = data.choices[0].message.content;
 
-    // Add the assistant's reply to the message history
-    messageHistory.push({ role: 'assistant', content: reply });
-
-    // Display the assistant's message
+    messageHistory.push({ role: 'assistant', content: reply }); // Save the assistant's reply
     displayMessage('Bot: ' + reply);
   } catch (error) {
+    console.error('Error:', error);
     displayMessage('Bot: Sorry, something went wrong. ' + error.message);
   }
 
-  // Auto-scroll to the bottom
-  chatBox.scrollTop = chatBox.scrollHeight;
+  chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the bottom
 }
 
+// Function to display messages in the chat box
 function displayMessage(message) {
   const messageElement = document.createElement('p');
   messageElement.textContent = message;
   chatBox.appendChild(messageElement);
-  // Auto-scroll to the bottom
-  chatBox.scrollTop = chatBox.scrollHeight;
+  chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the bottom
 }
 
-// Event listener for sending a message
+// Send a message when the send button is clicked
 sendButton.addEventListener('click', () => {
   const message = userInput.value.trim();
   if (message) {
-    sendMessage(message);
-    userInput.value = '';
+    displayMessage('You: ' + message);
+    messageHistory.push({ role: 'user', content: message }); // Save user message
+    makeApiRequest(message); // Call the API with the message
+    userInput.value = ''; // Clear input field
   }
 });
 
-// Send message on 'Enter' key press
+// Send a message when the user presses the 'Enter' key
 userInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     sendButton.click();

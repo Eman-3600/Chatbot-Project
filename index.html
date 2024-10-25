@@ -8,13 +8,25 @@
 </head>
 <body>
   <img src="angry-man.png" alt="Angry Teacher" class="background-image">
+
   <div class="chat-container">
-    <div id="chat-box"></div>
+    <div id="chat-box" style="border: 1px solid #000; height: 300px; overflow-y: scroll; margin-bottom: 10px;"></div>
     <input type="text" id="user-input" placeholder="Type a message..." />
     <button id="send-button">Send</button>
   </div>
+
   <div class="mean-message">YOU BETTER LOCK IN OR YOU WILL FAIL</div>
-  <div class="message">-xoxo, your discrete math ai tutor <3</div>
+  <div class="message">-xoxo, your discrete math AI tutor <3</div>
+
+  <!-- API Key Input Form -->
+  <form id="api-key-form" style="margin-top: 20px;">
+    <label for="apiKey">API Key:</label>
+    <input type="text" id="apiKey" name="apiKey" required>
+    <button type="submit">Save API Key</button>
+  </form>
+
+  <div id="response" style="margin-top: 10px;"></div>
+
   <script src="chatbot.js"></script>
 </body>
 </html>
