@@ -16,6 +16,19 @@ body {
 /* Mean motivating message */
 .mean-message {
   position: absolute;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  font-weight: bold;
+  color: rgba(255, 0, 0, 0.6); /* Red color with transparency */
+  text-align: center;
+  z-index: -1;
+  pointer-events: none; /* Ensure it doesn't interfere with other elements */
+}
+
+.message {
+  position: absolute;
   top: 10%;
   left: 50%;
   transform: translateX(-50%);
