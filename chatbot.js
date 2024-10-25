@@ -3,7 +3,7 @@ const userInput = document.getElementById('user-input');
 const chatBox = document.getElementById('chat-box');
 
 // API Key should be stored securely on the server side for actual implementations
-const OPENAI_API_KEY = 'your-api-key';
+const OPENAI_API_KEY = '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';
 
 // Initialize an array to store message history
 let messageHistory = [];
